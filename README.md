@@ -5,7 +5,7 @@ Early diagnosis of cerebral palsy and intervention is clinically considered as t
 
 For orginal ST-GCN code, please refer to https://github.com/yysijie/st-gcn/blob/master/OLD_README.md
 
-# Requirement
+# Library requirement
 See in requirement.txt
 
 # Getting started
