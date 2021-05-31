@@ -7,6 +7,7 @@ For orginal ST-GCN code, please refer to https://github.com/yysijie/st-gcn/blob/
 
 # Initialization
 python >= 3.7
+
 pytorch
 
 # Library requirement and installation
