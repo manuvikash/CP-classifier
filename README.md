@@ -10,8 +10,8 @@ See in requirement.txt
 
 # Getting started
 
-The command of running a demo with trained model
+The command of training models with Leave-One-Out Cross-Validation
 ```
-python main.py demo [--video ${PATH_TO_VIDEO}] [--openpose ${PATH_TO_OPENPOSE}]
+python start.py
 ```
 
