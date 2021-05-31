@@ -5,9 +5,17 @@ Early diagnosis of cerebral palsy and intervention is clinically considered as t
 
 For orginal ST-GCN code, please refer to https://github.com/yysijie/st-gcn/blob/master/OLD_README.md
 
-# Library requirement
-See in requirement.txt
+# Initialization
+python >= 3.7
+pytorch
 
+# Library requirement and installation
+`
+pip install requirement.txt
+`
+`
+cd torchlight; python setup.py install; cd ..
+`
 # Getting started
 
 The command of training models with Leave-One-Out Cross-Validation
