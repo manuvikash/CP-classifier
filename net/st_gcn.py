@@ -45,14 +45,8 @@ class Model(nn.Module):
         self.st_gcn_networks = nn.ModuleList((
             st_gcn(in_channels, 64, kernel_size, 1, residual=False, **kwargs0),
             st_gcn(64, 64, kernel_size, 1, **kwargs),
-            #st_gcn(64, 64, kernel_size, 1, **kwargs),
-            #st_gcn(64, 64, kernel_size, 1, **kwargs),
             st_gcn(64, 128, kernel_size, 2, **kwargs),
-            #st_gcn(128, 128, kernel_size, 1, **kwargs),
-            #st_gcn(128, 128, kernel_size, 1, **kwargs),
-            st_gcn(128, 256, kernel_size, 2, **kwargs),
-            #st_gcn(256, 256, kernel_size, 1, **kwargs),
-            #st_gcn(256, 256, kernel_size, 1, **kwargs),
+            st_gcn(128, 256, kernel_size, 2, **kwargs)
         ))
 
         # initialize parameters for edge importance weighting
@@ -65,7 +59,7 @@ class Model(nn.Module):
             self.edge_importance = [1] * len(self.st_gcn_networks)
 
         # fcn for prediction
-        #self.fcn = nn.Conv2d(64, num_class, kernel_size=1)
+
         self.fcn = nn.Conv2d(256, num_class, kernel_size=1)
 
     def forward(self, x):
@@ -161,7 +155,6 @@ class st_gcn(nn.Module):
 
         self.tcn = nn.Sequential(
             nn.InstanceNorm2d(out_channels),
-#            nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
             nn.Conv2d(
                 out_channels,
@@ -171,7 +164,6 @@ class st_gcn(nn.Module):
                 padding,
             ),
             nn.InstanceNorm2d(out_channels),
-#            nn.BatchNorm2d(out_channels),
             nn.Dropout(dropout, inplace=True),
         )
 
