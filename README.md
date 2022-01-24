@@ -1,5 +1,5 @@
 # FAIGCN: Frequency Attention Informed Graph Convolutional Network
-![Image text](https://github.com/zhz95/hzz/blob/master/net2.png)
+![Image text](https://github.com/zhz95/hzz/blob/master/FAIGCN.png)
 
 Cerebral Palsy Prediction with Frequency Attention Informed Graph Convolutional Networks
 
