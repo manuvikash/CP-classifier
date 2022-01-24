@@ -4,7 +4,7 @@ import sys
 import argparse
 import yaml
 import numpy as np
-import random
+
 # torch
 import torch
 import torch.nn as nn
@@ -15,10 +15,7 @@ import torchlight
 from torchlight import str2bool
 from torchlight import DictAction
 from torchlight import import_class
-
 from .processor import Processor
-
-
 
 def weights_init(m):
     classname = m.__class__.__name__
@@ -43,7 +40,6 @@ class REC_Processor(Processor):
         self.model = self.io.load_model(self.arg.model,
                                         **(self.arg.model_args))
         self.model.apply(weights_init)
-        #self.loss = nn.BCELoss()
         self.loss = nn.CrossEntropyLoss()
         
     def load_optimizer(self):
@@ -72,27 +68,19 @@ class REC_Processor(Processor):
         else:
             self.lr = self.arg.base_lr
 
-    def show_topk(self, k):
+    def show_acc(self, k):
         rank = self.result.argsort()
         hit_top_k = [l in rank[i, -k:] for i, l in enumerate(self.label)]
         accuracy = sum(hit_top_k) * 1.0 / len(hit_top_k)
-        self.io.print_log('\tTop{} Accuracy: {:.2f}%'.format(k, 100 * accuracy))
-    
-    def setup_seed(seed):
-        torch.manual_seed(seed)
-        torch.cuda.manual_seed_all(seed)
-        np.random.seed(seed)
-        random.seed(seed)
-        torch.backends.cudnn.deterministic=True
-    
-    setup_seed(100)
+        self.io.print_log('\tTesting Accuracy: {:.2f}%'.format( 100 * accuracy))
 
-    def train(self):
+    def train(self, evaluation=True):
         self.model.train()
         self.adjust_lr()
         loader = self.data_loader['train']
         loss_value = []
-
+        label_frag = []
+        result_frag = []
         for data, label in loader:
 
             # get data
@@ -110,12 +98,27 @@ class REC_Processor(Processor):
 
             # statistics
             self.iter_info['loss'] = loss.data.item()
+            self.iter_info['lr'] = '{:.6f}'.format(self.lr)
             loss_value.append(self.iter_info['loss'])
             self.show_iter_info()
             self.meta_info['iter'] += 1
+
+            # inference
+            with torch.no_grad():
+                output = self.model(data)
+            result_frag.append(output.data.cpu().numpy())
+
+            if evaluation:
+                loss = self.loss(output, label)
+                loss_value.append(loss.item())
+                label_frag.append(label.data.cpu().numpy())
+        self.result = np.concatenate(result_frag)
         self.epoch_info['mean_loss']= np.mean(loss_value)
         self.show_epoch_info()
         self.io.print_timer()
+        if evaluation:
+            self.label = np.concatenate(label_frag)
+            self.show_epoch_info()
 
     def test(self, evaluation=True):
 
@@ -145,17 +148,11 @@ class REC_Processor(Processor):
         self.result = np.concatenate(result_frag)
         if evaluation:
             self.label = np.concatenate(label_frag)
-            self.epoch_info['mean_loss']= np.mean(loss_value)
-            test_loss_dir = '/home/matt/SMIL/st-gcn/loss/test_loss.txt'
-            f2 = open(test_loss_dir,'a')
-            f2.write(str(np.mean(loss_value)))
-            f2.write('\n')
-            f2.close() 
-            # show top-k accuracy
-            for k in self.arg.show_topk:
-                self.show_topk(k)
+            self.show_epoch_info()
 
- 
+            # show accuracy
+            for k in self.arg.show_acc:
+                self.show_acc(k)
 
     @staticmethod
     def get_parser(add_help=False):
@@ -165,17 +162,17 @@ class REC_Processor(Processor):
         parser = argparse.ArgumentParser(
             add_help=add_help,
             parents=[parent_parser],
-            description='Spatial Temporal Graph Convolution Network')
+            description='Frequency Attention Informed Graph Convolution Network')
 
         # region arguments yapf: disable
         # evaluation
-        parser.add_argument('--show_topk', type=int, default=[1, 1], nargs='+', help='which Top K accuracy will be shown')
+        parser.add_argument('--show_acc', type=int, default=[1], nargs='+', help='which Top K accuracy will be shown')
         # optim
-        parser.add_argument('--base_lr', type=float, default=0.01, help='initial learning rate')
+        parser.add_argument('--base_lr', type=float, default=0.0001, help='initial learning rate')
         parser.add_argument('--step', type=int, default=[], nargs='+', help='the epoch where optimizer reduce the learning rate')
-        parser.add_argument('--optimizer', default='SGD', help='type of optimizer')
+        parser.add_argument('--optimizer', default='Adam', help='type of optimizer')
         parser.add_argument('--nesterov', type=str2bool, default=True, help='use nesterov or not')
-        parser.add_argument('--weight_decay', type=float, default=0.0001, help='weight decay for optimizer')
+        parser.add_argument('--weight_decay', type=float, default=0.1, help='weight decay for optimizer')
         # endregion yapf: enable
 
         return parser

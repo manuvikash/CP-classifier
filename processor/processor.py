@@ -177,8 +177,8 @@ class Processor(IO):
         parser.add_argument('--num_worker', type=int, default=4, help='the number of worker per gpu for data loader')
         parser.add_argument('--train_feeder_args', action=DictAction, default=dict(), help='the arguments of data loader for training')
         parser.add_argument('--test_feeder_args', action=DictAction, default=dict(), help='the arguments of data loader for test')
-        parser.add_argument('--batch_size', type=int, default=256, help='training batch size')
-        parser.add_argument('--test_batch_size', type=int, default=256, help='test batch size')
+        parser.add_argument('--batch_size', type=int, default=1, help='training batch size')
+        parser.add_argument('--test_batch_size', type=int, default=1, help='test batch size')
         parser.add_argument('--debug', action="store_true", help='less data, faster loading')
 
         # model

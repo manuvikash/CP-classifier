@@ -14,7 +14,7 @@ import tools.utils as utils
 
 class Demo(IO):
     """
-        Demo for Skeleton-based Action Recgnition
+        Demo for Skeleton-based Infant Joint Movement Frequency Recgnition
     """
     def start(self):
 
@@ -104,23 +104,8 @@ class Demo(IO):
         parser = argparse.ArgumentParser(
             add_help=add_help,
             parents=[parent_parser],
-            description='Demo for Spatial Temporal Graph Convolution Network')
+            description='Demo for FAIGCN')
 
-        # region arguments yapf: disable
-        parser.add_argument('--video',
-            default='./resource/media/skateboarding.mp4',
-            help='Path to video')
-        parser.add_argument('--openpose',
-            default='/home/matt/openpose/build/python/openpose/',
-            help='Path to openpose')
-        parser.add_argument('--output_dir',
-            default='./data/demo_result',
-            help='Path to save results')
-        parser.add_argument('--height',
-            default=1080,
-            type=int)
-        parser.set_defaults(config='./config/st_gcn/kinetics-skeleton/demo_old.yaml')
-        parser.set_defaults(print_log=False)
-        # endregion yapf: enable
+
 
         return parser
